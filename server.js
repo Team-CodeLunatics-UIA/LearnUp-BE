@@ -3,7 +3,10 @@ import bodyParser from "body-parser";
 import mongoose from "mongoose";
 import cors from "cors";
 import dotenev from "dotenv";
+import School from "./models/SchoolLogin.js";
+import Student from "./models/StudentLogin.js";
 
+let  JWT_SECRET="gydgyugdauihiwjoi";
 const app = express();
 dotenev.config();
 
