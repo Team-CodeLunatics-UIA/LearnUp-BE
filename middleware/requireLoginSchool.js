@@ -6,13 +6,13 @@ import School from '../models/SchoolLogin.js';
 
 const Log=(req,res,next)=>{
     
-   const {token,student}=req.cookies;
+   const {token,role}=req.cookies;
    
    if(!token){
        res.status(401).json({error:'You must be logged in'});
        return
    }
-   if(student==true){
+   if(role!="school"){
        res.json({error:'Unauthorised access'});
        return
    }

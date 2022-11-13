@@ -1,18 +1,18 @@
 import jwt from "jsonwebtoken";
 import mongoose from 'mongoose';
 import JWT_SECRET from '../app.js';
-import Student from './models/StudentLogin.js';
+import District from '../models/DistrictLogin.js';
 
 
 const Log=(req,res,next)=>{
     
-   const {token,student}=req.cookies;
+   const {token,role}=req.cookies;
    
    if(!token){
        res.status(401).json({error:'You must be logged in'});
        return
    }
-   if(student==false){
+   if(role!="district"){
        res.json({error:'Unauthorised access'});
        return
    }
@@ -22,7 +22,7 @@ const Log=(req,res,next)=>{
             return
        }
        const {_id}=payload;
-       Student.findById(_id).then(userdata=>{
+       District.findById(_id).then(userdata=>{
            req.user=userdata;
            next();
        })
