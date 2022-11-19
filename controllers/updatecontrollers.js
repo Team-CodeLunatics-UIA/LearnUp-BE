@@ -1,8 +1,10 @@
-import District from './models/DistrictLogin.js';
-import School from './models/SchoolLogin.js';
+//import District from './models/DistrictLogin.js';
+//import School from './models/SchoolLogin.js';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-import JWT_SECRET from '../app.js';
+//import JWT_SECRET from '../server.js';
+import Student from '../models/StudentPerformance.js';
+import axios from 'axios';
 
 export const CreateSchool=async(req,res)=>{
     
@@ -152,4 +154,40 @@ export const LoginDistrict  = async(req,res)=>{
             }
         })
     })
+}
+export const updatePerformancePrediction=async(req,res)=>{
+    const a=[];
+    try{ 
+         Student.find({}).then(
+                async(user)=>{
+                    const da= await axios({
+                        method: "post",
+                        url: `http://localhost:8000`,
+                        withCredentials: true, 
+                        //credentials: 'include',
+                        headers: {
+                          "Content-Type": "application/json",
+                        },
+                        data:user
+                      })
+                      console.log(da)
+                    if(user){
+                        user.map((item,index)=>{
+                    
+                          Student.findOneAndUpdate({_id:item._id},{$set:{G3:da.data[index]}} )
+                        })
+                   
+                        return res.json({message:a})
+                    }
+                    else{
+                        return res.json({error:"Try Again Later!"})
+                    }
+                }
+            )
+           
+    }
+     catch(err){
+            console.log(err);
+            return res.json({error:err})
+     }
 }

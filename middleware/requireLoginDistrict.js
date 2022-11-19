@@ -1,6 +1,6 @@
 import jwt from "jsonwebtoken";
 import mongoose from 'mongoose';
-import JWT_SECRET from '../app.js';
+import JWT_SECRET from '../server.js';
 import District from '../models/DistrictLogin.js';
 
 
