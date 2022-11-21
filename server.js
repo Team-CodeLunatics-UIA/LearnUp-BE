@@ -8,7 +8,8 @@ import Student from "./models/StudentPerformance.js"
 import ro from "./routes/route.js";
 //import Student from "./models/StudentLogin.js";
 
-//let  JWT_SECRET="gydgyugdauihiwjoi";
+let JWT_SECRET="gydgyugdauihiwjoi";
+ export default  JWT_SECRET;
 const app = express();
 dotenev.config();
 const origin="http://localhost:3000";

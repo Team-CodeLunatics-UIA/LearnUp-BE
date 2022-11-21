@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 //import autoIncrement from "mongoose-auto-increment";
-const studentSchema= new mongoose.Schema({
+const districtSchema= new mongoose.Schema({
     email:{
         type:String,
         required:true
@@ -17,5 +17,5 @@ const studentSchema= new mongoose.Schema({
 
 // autoIncrement.initialize(mongoose.connection);
 // productSchema.plugin(autoIncrement.plugin, 'Student');
-const Student=mongoose.model('Student',studentSchema); //models are used to create an interface of interaction between the schema and the database,js,etc
-export default Student;
+const District=mongoose.model('District',districtSchema); //models are used to create an interface of interaction between the schema and the database,js,etc
+export default District;

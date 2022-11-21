@@ -1,12 +1,12 @@
-//import District from './models/DistrictLogin.js';
-//import School from './models/SchoolLogin.js';
+import District from '../models/DistrictLogin.js';
+import School from '../models/SchoolLogin.js';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-//import JWT_SECRET from '../server.js';
+import JWT_SECRET from '../server.js';
 import Student from '../models/StudentPerformance.js';
 import axios from 'axios';
 
-export const CreateSchool=async(req,res)=>{
+export const SignupSchool=async(req,res)=>{
     
     const{email,password,userid}=req.body;
     if(!email || !password || !userid){// ! this means if it is empty
@@ -24,12 +24,12 @@ export const CreateSchool=async(req,res)=>{
           }
            bcrypt.hash(password,12)
         .then(hashedpassword=>{
-            const fac=new School({
+            const Schools=new School({
                 userid:userid,
                 email:email,
                 password:hashedpassword
               })
-              School.save()
+              Schools.save()
               .then(user=>{
                   console.log(user._id)
                   if(user){
@@ -48,7 +48,7 @@ export const CreateSchool=async(req,res)=>{
       })
     
 }
-export const CreateDistrict=async(req,res)=>{
+export const SignupDistrict=async(req,res)=>{
     
     const{email,password,code}=req.body;
     if(!email || !password || !code){// ! this means if it is empty
@@ -66,12 +66,12 @@ export const CreateDistrict=async(req,res)=>{
           }
            bcrypt.hash(password,12)
         .then(hashedpassword=>{
-            const fac=new School({
+            const Districts=new District({
                 code:code,
                 email:email,
                 password:hashedpassword
               })
-              District.save()
+              Districts.save()
               .then(user=>{
                   console.log(user._id)
                   if(user){
@@ -123,7 +123,7 @@ export const LoginSchool  = async(req,res)=>{
         })
     })
 }
-export const LoginDistrict  = async(req,res)=>{
+export const LoginDistrict = async(req,res)=>{
 
     console.log(req.body);
     const{email,password}=req.body;
