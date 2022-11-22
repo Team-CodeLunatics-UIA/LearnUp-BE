@@ -9,7 +9,15 @@ const districtSchema= new mongoose.Schema({
         type:String,
         required:true
     },
-    code:{
+    licenseid:{
+        type:String,
+        required:true
+    },
+    status:{
+        type:String,
+        required:true
+    },
+    name:{
         type:String,
         required:true
     }

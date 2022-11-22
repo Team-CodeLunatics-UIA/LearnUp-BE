@@ -8,8 +8,8 @@ import axios from 'axios';
 
 export const SignupSchool=async(req,res)=>{
     
-    const{email,password,userid}=req.body;
-    if(!email || !password || !userid){// ! this means if it is empty
+    const{email,password,schoolid,name,status}=req.body;
+    if(!email || !password || !schoolid){// ! this means if it is empty
        
         return res.json({error:'Please add all the fields'});
     }
@@ -25,9 +25,11 @@ export const SignupSchool=async(req,res)=>{
            bcrypt.hash(password,12)
         .then(hashedpassword=>{
             const Schools=new School({
-                userid:userid,
+                schoolid:schoolid,
                 email:email,
-                password:hashedpassword
+                password:hashedpassword,
+                name:name,
+                status:status
               })
               Schools.save()
               .then(user=>{
@@ -50,7 +52,7 @@ export const SignupSchool=async(req,res)=>{
 }
 export const SignupDistrict=async(req,res)=>{
     
-    const{email,password,code}=req.body;
+    const{email,password,licenseid,name,status}=req.body;
     if(!email || !password || !code){// ! this means if it is empty
        
         return res.json({error:'Please add all the fields'});
@@ -67,9 +69,11 @@ export const SignupDistrict=async(req,res)=>{
            bcrypt.hash(password,12)
         .then(hashedpassword=>{
             const Districts=new District({
-                code:code,
                 email:email,
-                password:hashedpassword
+                password:hashedpassword,
+                licenseid:licenseid,
+                name:name,
+                status:status
               })
               Districts.save()
               .then(user=>{
@@ -90,10 +94,10 @@ export const SignupDistrict=async(req,res)=>{
       })
     
 }
-export const LoginSchool  = async(req,res)=>{
+export const Login  = async(req,res)=>{
 
     console.log(req.body);
-    const{email,password}=req.body;
+    const{email,password,role}=req.body;
     if(!email || !password){
         
         return res.json({error:'Please fill all the fields'});
@@ -103,58 +107,51 @@ export const LoginSchool  = async(req,res)=>{
     if(!re.test(email)){
         return res.json({error:'invalid email id'})
     }
-    School.findOne({email:email})
-    .then(savedUser=>{
-        if(!savedUser){
-            return res.json({error:'Account does not exist'});
-             
-        }
-        bcrypt.compare(password,savedUser.password)
-        .then(doMatch=>{
-            if(doMatch){
-                const token=jwt.sign({_id:savedUser._id},JWT_SECRET);
-                const{_id,email}=savedUser;
-                    
-               return res.cookie("token",token,{httpOnly:true}).cookie("role","school",{httpOnly:true}).json({user:{email,_id},message:'Successfully Logged In!'})
+    if(role=="school"){
+        School.findOne({email:email})
+        .then(savedUser=>{
+            if(!savedUser){
+                return res.json({error:'Account does not exist'});
+                 
             }
-            else{
-                 return res.json({error:'Invalid email or password'});
-            }
+            bcrypt.compare(password,savedUser.password)
+            .then(doMatch=>{
+                if(doMatch){
+                    const token=jwt.sign({_id:savedUser._id},JWT_SECRET);
+                    const{_id,email}=savedUser;
+                        
+                   return res.cookie("token",token,{httpOnly:true}).cookie("role",role,{httpOnly:true}).json({user:{email,_id},message:'Successfully Logged In!'})
+                }
+                else{
+                     return res.json({error:'Invalid email or password'});
+                }
+            })
         })
-    })
+    }
+    else{
+        District.findOne({email:email})
+        .then(savedUser=>{
+            if(!savedUser){
+                return res.json({error:'Account does not exist'});
+                 
+            }
+            bcrypt.compare(password,savedUser.password)
+            .then(doMatch=>{
+                if(doMatch){
+                    const token=jwt.sign({_id:savedUser._id},JWT_SECRET);
+                    const{_id,email}=savedUser;
+                        
+                   return res.cookie("token",token,{httpOnly:true}).cookie("role","district",{httpOnly:true}).json({user:{email,_id},message:'Successfully Logged In!'})
+                }
+                else{
+                     return res.json({error:'Invalid email or password'});
+                }
+            })
+        })
+    }
+    
 }
-export const LoginDistrict = async(req,res)=>{
 
-    console.log(req.body);
-    const{email,password}=req.body;
-    if(!email || !password){
-        return res.json({error:'Please fill all the fields'});
-         
-    }
-    const re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;//regex for validating email
-    if(!re.test(email)){
-        return res.json({error:'invalid email id'})
-    }
-    District.findOne({email:email})
-    .then(savedUser=>{
-        if(!savedUser){
-            return res.json({error:'Account does not exist'});
-             
-        }
-        bcrypt.compare(password,savedUser.password)
-        .then(doMatch=>{
-            if(doMatch){
-                const token=jwt.sign({_id:savedUser._id},JWT_SECRET);
-                const{_id,email}=savedUser;
-                    
-               return res.cookie("token",token,{httpOnly:true}).cookie("role","district",{httpOnly:true}).json({user:{email,_id},message:'Successfully Logged In!'})
-            }
-            else{
-                 return res.json({error:'Invalid email or password'});
-            }
-        })
-    })
-}
 export const updatePerformancePrediction=async(req,res)=>{
     const a=[];
     try{ 

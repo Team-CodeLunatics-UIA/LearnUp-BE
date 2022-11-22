@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 //import autoIncrement from "mongoose-auto-increment";
 const schoolSchema= new mongoose.Schema({
-    userid:{
+    schoolid:{
         type:String,
         required:true
     },
@@ -10,6 +10,14 @@ const schoolSchema= new mongoose.Schema({
         required:true
     },
     password:{
+        type:String,
+        required:true
+    },
+    name:{
+        type:String,
+        required:true
+    },
+    status:{
         type:String,
         required:true
     }
