@@ -1,15 +1,20 @@
 import District from '../models/DistrictLogin.js';
-import School from '../models/SchoolLogin.js';
+import School from '../models/Login.js';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import JWT_SECRET from '../server.js';
 import Student from '../models/StudentPerformance.js';
 import axios from 'axios';
+import StudentTeacher from '../models/StudentChartData.js';
+import StudentTeacherSchool from '../models/StudentSchoolChartData.js';
+import User from '../models/Login.js';
 
-export const SignupSchool=async(req,res)=>{
+
+
+export const Signup=async(req,res)=>{
     
-    const{email,password,schoolid,name,status}=req.body;
-    if(!email || !password || !schoolid){// ! this means if it is empty
+    const{email,password,id,name,status}=req.body;
+    if(!email || !password){// ! this means if it is empty
        
         return res.json({error:'Please add all the fields'});
     }
@@ -17,68 +22,24 @@ export const SignupSchool=async(req,res)=>{
     if(!re.test(email)){
         return res.json({error:'invalid email id'})
     }
-       School.findOne({email:email})
+       User.findOne({email:email})
       .then(savedUser=>{
           if(savedUser){
                return res.json({error:'User with this emailid already exisits'});// We should always add the return keyword to the error so that the code further is not executed
           }
            bcrypt.hash(password,12)
         .then(hashedpassword=>{
-            const Schools=new School({
-                schoolid:schoolid,
+            const users=new User({
                 email:email,
                 password:hashedpassword,
+                id:id,
                 name:name,
                 status:status
               })
-              Schools.save()
-              .then(user=>{
-                  console.log(user._id)
-                  if(user){
-                      res.json({message:"Successfully Signed Up!"})
-                  }
-                  else{
-                      return res.json({error:"Try Again Later!"})
-                  }
-              }).catch((err)=>{
-                  console.log(err);
-              })})
-              
-          
-      }).catch((err)=>{
-          console.log(err);
-      })
-    
-}
-export const SignupDistrict=async(req,res)=>{
-    
-    const{email,password,licenseid,name,status}=req.body;
-    if(!email || !password || !code){// ! this means if it is empty
-       
-        return res.json({error:'Please add all the fields'});
-    }
-    const re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;//regex for validating email
-    if(!re.test(email)){
-        return res.json({error:'invalid email id'})
-    }
-       District.findOne({email:email})
-      .then(savedUser=>{
-          if(savedUser){
-               return res.json({error:'User with this emailid already exisits'});// We should always add the return keyword to the error so that the code further is not executed
-          }
-           bcrypt.hash(password,12)
-        .then(hashedpassword=>{
-            const Districts=new District({
-                email:email,
-                password:hashedpassword,
-                licenseid:licenseid,
-                name:name,
-                status:status
-              })
-              Districts.save()
-              .then(user=>{
-                  console.log(user._id)
-                  if(user){
+              users.save()
+              .then(usersers=>{
+                  
+                  if(usersers){
                       res.json({message:"Successfully Signed Up!"})
                   }
                   else{
@@ -108,10 +69,14 @@ export const Login  = async(req,res)=>{
         return res.json({error:'invalid email id'})
     }
     if(role=="school"){
-        School.findOne({email:email})
+        User.findOne({email:email})
         .then(savedUser=>{
             if(!savedUser){
                 return res.json({error:'Account does not exist'});
+                 
+            }
+            if(savedUser.status!="school"){
+                return res.json({error:'Invalid Credentials'});
                  
             }
             bcrypt.compare(password,savedUser.password)
@@ -120,7 +85,32 @@ export const Login  = async(req,res)=>{
                     const token=jwt.sign({_id:savedUser._id},JWT_SECRET);
                     const{_id,email}=savedUser;
                         
-                   return res.cookie("token",token,{httpOnly:true}).cookie("role",role,{httpOnly:true}).json({user:{email,_id},message:'Successfully Logged In!'})
+                   return res.cookie("token",token,{httpOnly:true}).json({data:{user:savedUser,token:token},message:'Successfully Logged In!'})
+                }
+                else{
+                     return res.json({error:'Invalid email or password'});
+                }
+            })
+        })
+    }
+    else if(role=="teacher"){
+        User.findOne({email:email})
+        .then(savedUser=>{
+            if(!savedUser){
+                return res.json({error:'Account does not exist'});
+                 
+            }
+            if(savedUser.status!="teacher"){
+                return res.json({error:'Invalid Credentials'});
+                 
+            }
+            bcrypt.compare(password,savedUser.password)
+            .then(doMatch=>{
+                if(doMatch){
+                    const token=jwt.sign({_id:savedUser._id},JWT_SECRET);
+                    const{_id,email}=savedUser;
+                        
+                   return res.cookie("token",token,{httpOnly:true}).json({data:{user:savedUser,token:token},message:'Successfully Logged In!'})
                 }
                 else{
                      return res.json({error:'Invalid email or password'});
@@ -129,10 +119,14 @@ export const Login  = async(req,res)=>{
         })
     }
     else{
-        District.findOne({email:email})
+        User.findOne({email:email})
         .then(savedUser=>{
             if(!savedUser){
                 return res.json({error:'Account does not exist'});
+                 
+            }
+            if(savedUser.status!="district"){
+                return res.json({error:'Invalid Credentials'});
                  
             }
             bcrypt.compare(password,savedUser.password)
@@ -141,7 +135,7 @@ export const Login  = async(req,res)=>{
                     const token=jwt.sign({_id:savedUser._id},JWT_SECRET);
                     const{_id,email}=savedUser;
                         
-                   return res.cookie("token",token,{httpOnly:true}).cookie("role","district",{httpOnly:true}).json({user:{email,_id},message:'Successfully Logged In!'})
+                   return res.cookie("token",token,{httpOnly:true}).json({data:{user:savedUser,token:token},message:'Successfully Logged In!'})
                 }
                 else{
                      return res.json({error:'Invalid email or password'});
@@ -151,7 +145,32 @@ export const Login  = async(req,res)=>{
     }
     
 }
+export const  UploadStudentData = async(req,res)=>{
 
+    const{name,classs,rollno,age,gender,maths,physics,chemistry,attendance}=req.body;
+    try{const data=new StudentTeacher({
+        name:name,
+        class:classs,
+        rollno:rollno,
+        age:age,
+        gender:gender,
+        maths:maths,
+        physics:physics,
+        chemistry:chemistry,
+        attendance:attendance,
+        subject:["maths","physics","chemistry"]
+    })
+   data.save().then(shre=>{
+      const fulldata=StudentTeacher.find();
+      console.log(fulldata)
+      
+    return res.json({message:"Successfully Uploaded!"})
+   })}
+   catch(err){
+         return res.json({error:err})
+   }
+    
+}
 export const updatePerformancePrediction=async(req,res)=>{
     const a=[];
     try{ 
@@ -188,3 +207,37 @@ export const updatePerformancePrediction=async(req,res)=>{
             return res.json({error:err})
      }
 }
+export const  UploadAttendance = async(req,res)=>{
+
+    const{name,present}=req.body;
+    try{
+   
+    //   const fulldata=await StudentTeacher.findOne({name:name});
+    //   var dat=new Date().toJSON.slice(0,10).replace(/-/g,'/');
+    //   console.log(dat)
+    //   if(present){
+    //     fulldata.attendance[fulldata.attendance.length-1]+=1;
+    //     fulldata.save();
+    //   }
+    // return res.json({message:"Successfully Uploaded!"})
+   }
+   catch(err){
+         return res.json({error:err})
+   }
+    
+}
+// export const  getScore = async(req,res)=>{
+ 
+//     try{
+   
+//       const fulldata=await StudentTeacher.findOne({name:name});
+//       fulldata.attendance[2]+=1;
+//       fulldata.save();
+      
+//     return res.json({message:"Successfully Uploaded!"})
+//    }
+//    catch(err){
+//          return res.json({error:err})
+//    }
+    
+// }

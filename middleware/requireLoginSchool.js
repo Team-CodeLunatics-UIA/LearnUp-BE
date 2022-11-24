@@ -1,7 +1,7 @@
 import jwt from "jsonwebtoken";
 import mongoose from 'mongoose';
 import JWT_SECRET from '../server.js';
-import School from '../models/SchoolLogin.js';
+//import School from '../models/SchoolLogin.js';
 
 
 const Log=(req,res,next)=>{

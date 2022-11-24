@@ -3,7 +3,7 @@ import bodyParser from "body-parser";
 import mongoose from "mongoose";
 import cors from "cors";
 import dotenev from "dotenv";
-import School from "./models/SchoolLogin.js";
+import School from "./models/Login.js";
 import Student from "./models/StudentPerformance.js"
 import ro from "./routes/route.js";
 //import Student from "./models/StudentLogin.js";

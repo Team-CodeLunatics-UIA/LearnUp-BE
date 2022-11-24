@@ -69,19 +69,19 @@ const studentSchema= new mongoose.Schema({
         type:String,
         required:true
    },
-guardian:{
+  guardian:{
         type:String,
         required:true
 },
-traveltime:{
+  traveltime:{
         type:String,
         required:true
 },
-studytime:{
+   studytime:{
         type:String,
         required:true
 },
-failures:{
+ failures:{
         type:String,
         required:true
 },
