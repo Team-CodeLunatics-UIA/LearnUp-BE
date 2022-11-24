@@ -10,6 +10,6 @@ router.post('/studentperformance',updatePerformancePrediction);
 router.post('/uploadstudentdata',UploadStudentData);
 router.post('/uploadattendance',UploadAttendance);
 router.post('/getscore',getScore);
-router.post('/sendalert',sendAlert);
+router.get('/sendalert',sendAlert);
 
 export default router;
