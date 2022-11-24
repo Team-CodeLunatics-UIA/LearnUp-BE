@@ -8,7 +8,7 @@ import axios from 'axios';
 import StudentTeacher from '../models/StudentChartData.js';
 import StudentTeacherSchool from '../models/StudentSchoolChartData.js';
 import User from '../models/Login.js';
-
+import Students from '../models/StudentPerformance.js';
 
 
 export const Signup=async(req,res)=>{
@@ -212,27 +212,30 @@ export const  UploadAttendance = async(req,res)=>{
     const{name,present}=req.body;
     try{
    
-    //   const fulldata=await StudentTeacher.findOne({name:name});
-    //   var dat=new Date().toJSON.slice(0,10).replace(/-/g,'/');
-    //   console.log(dat)
-    //   if(present){
-    //     fulldata.attendance[fulldata.attendance.length-1]+=1;
-    //     fulldata.save();
-    //   }
-    // return res.json({message:"Successfully Uploaded!"})
+    const fulldata=await StudentTeacher.findOne({name:name});
+      var dat=new Date().toJSON().slice(0,10);
+      if(dat[8]==0 && dat[9]==1){
+         fulldata.attendance.push(present?1:0);
+      }
+      else{
+        if(present){
+            fulldata.attendance[fulldata.attendance.length-1]+=1;
+            fulldata.save();
+          }
+      }
+    return res.json({message:"Successfully Uploaded!"})
    }
    catch(err){
          return res.json({error:err})
    }
     
 }
-// export const  getScore = async(req,res)=>{
+export const  getScore = async(req,res)=>{
  
 //     try{
    
-//       const fulldata=await StudentTeacher.findOne({name:name});
-//       fulldata.attendance[2]+=1;
-//       fulldata.save();
+//       const fulldata=await StudentTeacher.find({});
+//       console.log(fulldata)
       
 //     return res.json({message:"Successfully Uploaded!"})
 //    }
@@ -240,4 +243,16 @@ export const  UploadAttendance = async(req,res)=>{
 //          return res.json({error:err})
 //    }
     
-// }
+}
+export const  sendAlert = async(req,res)=>{
+ 
+try{
+     const data=await Students.find({"G3":{$gt:20}});
+     return res.json({data:data})
+       
+}
+catch(err){
+        return res.json({error:err})
+}
+    
+}
